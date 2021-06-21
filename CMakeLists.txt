@@ -1,0 +1,32 @@
+cmake_minimum_required(VERSION 3.19)
+project(CalcGTK)
+
+set(CMAKE_C_STANDARD 11)
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/include)
+
+if(win32)
+    set(DEPS gtk+-3.0)
+    set(CMAKE_C_FLAGS_RELEASE -mwindows)
+elseif(APPLE)
+    set(DEPS gtk+-3.0 glib-2.0)
+else()
+    set(DEPS gtk+-3.0)
+endif()
+
+FIND_PACKAGE(PkgConfig REQUIRED)
+
+foreach(dep ${DEPS})
+    PKG_CHECK_MODULES(${dep} REQUIRED ${dep})
+    INCLUDE_DIRECTORIES(${${dep}_INCLUDE_DIRS})
+    LINK_LIBRARIES(${${dep}_LIBRARY_DIRS})
+endforeach()
+
+SET(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
+
+SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_LIST_DIR}/packet_app/bin)
+
+AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR} DIR_SRCS)
+
+ADD_EXECUTABLE(CalcGTK ${DIR_SRCS})
+TARGET_LINK_LIBRARIES(CalcGTK ${GTK3_LIBRARIES} ${GMODULE_LIBRARIES})
